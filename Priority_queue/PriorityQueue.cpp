@@ -3,11 +3,10 @@
 
 void PQueue::Erase()
 {
-	while (pop());
-	size = 0;
-	size_high = 0;
-	size_medium = 0;
-	size_low = 0;
+	while (Pop());
+	size[0] = 0;
+	size[1] = 0;
+	size[2] = 0;
 }
 
 void PQueue::Clone(const PQueue& q)
@@ -33,21 +32,18 @@ void PQueue::move(PQueue&& other)
 	move(rear_medium, other.rear_medium);
 	move(rear_low, other.rear_low);
 
-	size = other.size;
-	size_high = other.size_high;
-	size_medium = other.size_medium;
-	size_low = other.size_low;
-
-	other.size_high = 0;
-	other.size_medium = 0;
-	other.size_low = 0;
-	other.size = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		size[i] = other.size[i];
+		other.size[i] = 0;
+	}
 }
 
-PQueue::PQueue(const PQueue& Q)
+PQueue::PQueue(const PQueue& other)
 {
-	size = 0;
-	Clone(Q);
+	for (int i = 0; i < 4; i++)
+		size[i] = 0;
+	Clone(other);
 }
 
 PQueue::PQueue(PQueue&& other) noexcept
@@ -57,45 +53,37 @@ PQueue::PQueue(PQueue&& other) noexcept
 	move(rear_medium, other.rear_medium);
 	move(rear_low, other.rear_low);
 
-	size = other.size;
-	size_high = other.size_high;
-	size_medium = other.size_medium;
-	size_low = other.size_low;
-
-	other.size_high = 0;
-	other.size_medium = 0;
-	other.size_low = 0;
-	other.size = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		size[i] = other.size[i];
+		other.size[i] = 0;
+	}
 }
 
-PQueue& PQueue::operator=(const PQueue& Q)
+PQueue& PQueue::operator=(const PQueue& other)
 {
-	if (this != &Q)
+	if (&other != this)
 	{
 		Erase();
-		Clone(Q);
+		Clone(other);
 	}
-	return *this;
+	return (*this);
 }
 
 PQueue& PQueue::operator=(PQueue&& other) noexcept
 {
 	if (&other == this)
-		return *this;
+		return (*this);
 	Erase();
 	move(front, other.front);
 	move(rear_high, other.rear_high);
 	move(rear_medium, other.rear_medium);
 	move(rear_low, other.rear_low);
-	size = other.size;
-	size_high = other.size_high;
-	size_medium = other.size_medium;
-	size_low = other.size_low;
-
-	other.size_high = 0;
-	other.size_medium = 0;
-	other.size_low = 0;
-	other.size = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		size[i] = other.size[i];
+		other.size[i] = 0;
+	}
 	return *this;
 }
 
@@ -104,24 +92,24 @@ PQueue::~PQueue()
 	Erase();
 }
 
+unsigned PQueue::GetSize(Priority astatus) const
+{
+	switch(astatus)
+	{
+	case Priority(1):
+		return size[0];
+
+	case Priority(2):
+		return size[1];
+
+	case Priority(3):
+		return size[2];
+	}
+}
+
 unsigned PQueue::GetSize() const
 {
-	return size;
-}
-
-unsigned PQueue::GetHighSize() const
-{
-	return size_high;
-}
-
-unsigned PQueue::GetMediumSize() const
-{
-	return size_medium;
-}
-
-unsigned PQueue::GetLowSize() const
-{
-	return size_low;
+	return size[3];
 }
 
 bool PQueue::IsEmpty() const
@@ -136,9 +124,9 @@ void PQueue::Push(InfoType Ainfo,Priority astatus)
 	QItem* tmp1 = new QItem(Ainfo,astatus);
 	if (astatus == Priority(1))// high
 	{
-		if (rear_medium != NULL || rear_low != NULL)//åñòü ýëåìåíòû ñ ïðèîðèòåòîì íèæå
+		if (rear_medium != NULL || rear_low != NULL)//есть элементы с приоритетом ниже
 		{
-			if (rear_high != NULL)// åñòü high
+			if (rear_high != NULL)// есть high
 			{
 				QItem* tmp2 = rear_high->next;
 				rear_high->next = tmp1;
@@ -152,31 +140,31 @@ void PQueue::Push(InfoType Ainfo,Priority astatus)
 			}
 
 		}
-		if(rear_medium == NULL && rear_low == NULL)// íåò low è medium
+		if(rear_medium == NULL && rear_low == NULL)// нет low и medium
 		{
-			if (size > 0)
+			if (size[3] > 0)
 				rear_high->next = tmp1;
 			else
 				front = tmp1;
 		}
 		rear_high = tmp1;
-		size_high++;
+		size[0]++;
 	}
 	if (astatus == Priority(2))// medium
 	{
-		if (rear_high != NULL && rear_low == NULL)// åñòü high íåò low
+		if (rear_high != NULL && rear_low == NULL)// есть high нет low
 			if(rear_medium != NULL)
 				rear_medium->next = tmp1;
 			else
 				rear_high->next = tmp1;
 
-		if (rear_high == NULL && rear_low == NULL)// íåò high è low
+		if (rear_high == NULL && rear_low == NULL)// нет high и low
 			if (rear_medium != NULL)
 				rear_medium->next = tmp1;
 			else
 					front = tmp1;
 
-		if (rear_high == NULL && rear_low != NULL)// åñòü low íåò high
+		if (rear_high == NULL && rear_low != NULL)// есть low нет high
 		{
 			if (rear_medium != NULL)
 			{
@@ -191,7 +179,7 @@ void PQueue::Push(InfoType Ainfo,Priority astatus)
 				tmp1->next = tmp2;
 			}
 		}
-		if (rear_high != NULL && rear_low != NULL)//åñòü high è low
+		if (rear_high != NULL && rear_low != NULL)//есть high и low
 		{
 			{
 				if (rear_medium != NULL)
@@ -210,14 +198,14 @@ void PQueue::Push(InfoType Ainfo,Priority astatus)
 		}
 
 		rear_medium = tmp1;
-		size_medium++;
+		size[1]++;
 	}
 	if (astatus == Priority(3))// low
 	{
 		if (rear_low != NULL)
 			rear_low->next = tmp1;
 		else
-			if (size == 0)
+			if (size[3] == 0)
 				front = tmp1;
 			else
 				if (rear_medium != NULL)
@@ -225,58 +213,60 @@ void PQueue::Push(InfoType Ainfo,Priority astatus)
 				else
 					rear_high->next = tmp1;
 		rear_low = tmp1;
-		size_low++;
+		size[2]++;
 	}
-	size++;
+	size[3]++;
 }
 
-bool PQueue::pop()
+bool PQueue::Pop()
 {
-		if (size == 0)
+	if (size[3] == 0)
 		return false;
 	QItem* tmp = front;
 	Priority pr = front->status;
 	front = front->next;
 
 	delete tmp;
-	size--;
+	size[3]--;
 	switch (pr)
 	{
 	case Priority(1):
-		size_high--;
+		size[0]--;
+		if (size[0] == 0)
+			rear_high = NULL;
 		break;
 	case Priority(2):
-		size_medium--;
+		size[1]--;
+		if (size[1] == 0)
+			rear_medium = NULL;
 		break;
 	case Priority(3):
-		size_low--;
+		size[2]--;
+		if (size[2] == 0)
+			rear_low = NULL;
 		break;
 	}
-	if (size_high == 0)
-		rear_high = NULL;
-	if (size_medium == 0)
-		rear_medium = NULL;
-	if (size_low == 0)
-		rear_low = NULL;
 	return true;
 }
 
-InfoType PQueue::GetFirst() const//åñëè óäàëèòü const è äîáàâèòü ñïåðåäè & ìîæíî èçìåíÿòü ïåðâûé ýëåìåíò
+InfoType PQueue::GetFirstValue() const
 {
-	if (size == 0)
-		throw exception("Impossible to execute\GetFirst:queue is empty");
+	if (size[3] == 0)
+		throw exception("Impossible to execute\GetFirstValue:queue is empty");
 	return front->info;
 }
 
-string PQueue::GetFirstPriority() const
+Priority PQueue::GetFirstPriority() const
 {
-	return PRIORITY_NAMES[(int)front->status - 1];
+	if (size[3] == 0)
+		throw exception("Impossible to execute\GetFirstPriority:queue is empty");
+	return front->status;
 }
 
 InfoType PQueue::operator[](unsigned k) const
 {
 
-	if ((k < 0) || (k >= size))
+	if ((k < 0) || (k >= size[3]))
 				throw exception("Impossible to execute\operator[]: invalid index");
 			QItem* tmp = front;
 			for (unsigned i = 0; i < k; i++)
