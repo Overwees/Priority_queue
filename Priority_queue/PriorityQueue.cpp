@@ -136,9 +136,9 @@ void PQueue::Push(InfoType Ainfo,Priority astatus)
 	QItem* tmp1 = new QItem(Ainfo,astatus);
 	if (astatus == Priority(1))// high
 	{
-		if (rear_medium != NULL || rear_low != NULL)//есть элементы с приоритетом ниже
+		if (rear_medium != NULL || rear_low != NULL)//ГҐГ±ГІГј ГЅГ«ГҐГ¬ГҐГ­ГІГ» Г± ГЇГ°ГЁГ®Г°ГЁГІГҐГІГ®Г¬ Г­ГЁГ¦ГҐ
 		{
-			if (rear_high != NULL)// есть high
+			if (rear_high != NULL)// ГҐГ±ГІГј high
 			{
 				QItem* tmp2 = rear_high->next;
 				rear_high->next = tmp1;
@@ -152,7 +152,7 @@ void PQueue::Push(InfoType Ainfo,Priority astatus)
 			}
 
 		}
-		if(rear_medium == NULL && rear_low == NULL)// нет low и medium
+		if(rear_medium == NULL && rear_low == NULL)// Г­ГҐГІ low ГЁ medium
 		{
 			if (size > 0)
 				rear_high->next = tmp1;
@@ -164,19 +164,19 @@ void PQueue::Push(InfoType Ainfo,Priority astatus)
 	}
 	if (astatus == Priority(2))// medium
 	{
-		if (rear_high != NULL && rear_low == NULL)// есть high нет low
+		if (rear_high != NULL && rear_low == NULL)// ГҐГ±ГІГј high Г­ГҐГІ low
 			if(rear_medium != NULL)
 				rear_medium->next = tmp1;
 			else
 				rear_high->next = tmp1;
 
-		if (rear_high == NULL && rear_low == NULL)// нет high и low
+		if (rear_high == NULL && rear_low == NULL)// Г­ГҐГІ high ГЁ low
 			if (rear_medium != NULL)
 				rear_medium->next = tmp1;
 			else
 					front = tmp1;
 
-		if (rear_high == NULL && rear_low != NULL)// есть low нет high
+		if (rear_high == NULL && rear_low != NULL)// ГҐГ±ГІГј low Г­ГҐГІ high
 		{
 			if (rear_medium != NULL)
 			{
@@ -191,7 +191,7 @@ void PQueue::Push(InfoType Ainfo,Priority astatus)
 				tmp1->next = tmp2;
 			}
 		}
-		if (rear_high != NULL && rear_low != NULL)//есть high и low
+		if (rear_high != NULL && rear_low != NULL)//ГҐГ±ГІГј high ГЁ low
 		{
 			{
 				if (rear_medium != NULL)
@@ -232,22 +232,36 @@ void PQueue::Push(InfoType Ainfo,Priority astatus)
 
 bool PQueue::pop()
 {
-	if (size == 0)
+		if (size == 0)
 		return false;
 	QItem* tmp = front;
+	Priority pr = front->status;
 	front = front->next;
+
 	delete tmp;
 	size--;
-	if (size == 0)
+	switch (pr)
 	{
-		rear_high = NULL;
-		rear_medium = NULL;
-		rear_low = NULL;
+	case Priority(1):
+		size_high--;
+		break;
+	case Priority(2):
+		size_medium--;
+		break;
+	case Priority(3):
+		size_low--;
+		break;
 	}
+	if (size_high == 0)
+		rear_high = NULL;
+	if (size_medium == 0)
+		rear_medium = NULL;
+	if (size_low == 0)
+		rear_low = NULL;
 	return true;
 }
 
-InfoType PQueue::GetFirst() const//если удалить const и добавить спереди & можно изменять первый элемент
+InfoType PQueue::GetFirst() const//ГҐГ±Г«ГЁ ГіГ¤Г Г«ГЁГІГј const ГЁ Г¤Г®ГЎГ ГўГЁГІГј Г±ГЇГҐГ°ГҐГ¤ГЁ & Г¬Г®Г¦Г­Г® ГЁГ§Г¬ГҐГ­ГїГІГј ГЇГҐГ°ГўГ»Г© ГЅГ«ГҐГ¬ГҐГ­ГІ
 {
 	if (size == 0)
 		throw exception("Impossible to execute\GetFirst:queue is empty");
