@@ -27,10 +27,10 @@ private:
 		QItem(InfoType Ainfo,Priority astatus) : info(Ainfo),status(astatus), next(NULL) {}
 	};
 	QItem* front, * rear_high, * rear_medium, * rear_low;
-	unsigned size;
-	unsigned size_high;
-	unsigned size_medium;
-	unsigned size_low;
+	unsigned size[4];//0 - size high
+	//2 - size medium
+	//3 - size low
+	//4 - full size
 
 	void Erase();
 	void Clone(const PQueue&);
@@ -38,7 +38,7 @@ private:
 	void move(PQueue&& other);
 public:
 
-	PQueue() :front(NULL), rear_high(NULL), rear_medium(NULL), rear_low(NULL), size(0) {};
+	PQueue() :front(NULL), rear_high(NULL), rear_medium(NULL), rear_low(NULL){};
 	PQueue(const PQueue&);
 	PQueue(PQueue&&) noexcept; 
 
@@ -47,15 +47,13 @@ public:
 	PQueue& operator = (const PQueue&);
 	PQueue& operator = (PQueue&&) noexcept;
 
+	unsigned GetSize(Priority)const;
 	unsigned GetSize()const;
-	unsigned GetHighSize()const;
-	unsigned GetMediumSize()const;
-	unsigned GetLowSize()const;
 	bool IsEmpty() const;
 	void Push(InfoType Ainfo,Priority astatus);
-	bool pop();
-	InfoType GetFirst()const;
-	string GetFirstPriority()const;
+	bool Pop();
+	InfoType GetFirstValue()const;
+	Priority GetFirstPriority()const;
 	InfoType operator [](unsigned)const;	
 };
 
