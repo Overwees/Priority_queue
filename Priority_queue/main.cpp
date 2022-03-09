@@ -24,13 +24,13 @@ void queue_size(PQueue& queue)
 	switch (tmp)
 	{
 	case 1:
-		cout<<queue.GetHighSize()<<endl;
+		cout<<queue.GetSize(Priority(1))<<endl;
 		break;
 	case 2:
-		cout << queue.GetMediumSize() << endl;
+		cout << queue.GetSize(Priority(2)) << endl;
 		break;
 	case 3:
-		cout << queue.GetLowSize() << endl;
+		cout << queue.GetSize(Priority(3)) << endl;
 		break;
 	default:
 		cerr << "Error! Invalid priority!" << endl;
@@ -76,6 +76,8 @@ int main()
 	q_two.Push(89, Priority(2));
 	q_two.Push(7, Priority(3));
 	q_two.Push(3, Priority(1));
+	q_two.Push(5, Priority(1));
+	q_two.Push(35, Priority(1));
 	int op;
 	while (true)
 	{
@@ -104,6 +106,7 @@ int main()
 			break;
 		case 3:
 			cout << "First queue size - " << q_one.GetSize() << endl;
+			cout << "Second queue size - " << q_two.GetSize() << endl;
 			break;
 		case 4:
 			queue_size(q_one);
@@ -118,13 +121,13 @@ int main()
 			push_element(q_one);
 			break;
 		case 7:
-			q_one.pop();
+			q_one.Pop();
 			break;
 		case 8:
 			if (q_one.GetSize() > 0)
-			cout << "First element value - "  << q_one.GetFirst()<<" , priority - " << q_one.GetFirstPriority() << endl;
+			cout << "First element value - "  << q_one.GetFirstValue() << endl;
 			if(q_two.GetSize()>0)
-			cout << "First element value - " << q_two.GetFirst() << " , priority - " << q_two.GetFirstPriority() << endl;
+			cout << "First element value - " << q_two.GetFirstValue() << endl;
 			break;
 		case 9:
 			if (q_one.GetSize() > 0)
